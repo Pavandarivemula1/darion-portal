@@ -14,11 +14,11 @@
       ]
     },
     {
-      "source": "/projects/(.*)\.css",
+      "source": "/projects/(.*)\\.css",
       "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
     },
     {
-      "source": "/projects/(.*)\.js",
+      "source": "/projects/(.*)\\.js",
       "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
     }
   ]
