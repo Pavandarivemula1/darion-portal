@@ -293,9 +293,17 @@ function renderStepper() {
 /* ── Phase List Sidebar ───────────────────────────────────────── */
 function renderPhaseList() {
   const q = searchQuery.trim().toLowerCase();
-  const filtered = q
-    ? PHASES.filter(p => `${p.code} ${p.title} ${p.status} ${p.clientAction} ${p.decision} ${p.updateNote}`.toLowerCase().includes(q))
-    : PHASES;
+  let filtered = [];
+  
+  if (q) {
+    filtered = PHASES.filter(p => `${p.code} ${p.title} ${p.status} ${p.clientAction} ${p.decision} ${p.updateNote}`.toLowerCase().includes(q));
+  } else {
+    // Only show active progressing phase by default
+    filtered = PHASES.filter(p => p.status === 'In Progress');
+    if (!filtered.length) {
+      filtered = [PHASES.find(p => p.id === activePhaseId) || PHASES[0]];
+    }
+  }
 
   const el = document.getElementById("phase-list");
   if (!filtered.length) {
@@ -547,15 +555,19 @@ async function init() {
   initBudgetToggle();
   initSearch();
 
-  // Create a chat session ID for this page visit (used by chat widget for Supabase logging)
+  // Create or restore chat session ID (used by chat widget for Supabase logging)
   try {
-    const sid = crypto.randomUUID();
+    let sid = localStorage.getItem('bpo_chat_sid');
+    if (!sid) {
+      sid = crypto.randomUUID();
+      localStorage.setItem('bpo_chat_sid', sid);
+      fetch(`${SB_URL}/rest/v1/chat_sessions`, {
+        method: 'POST',
+        headers: { ...SB_HEADERS, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ id: sid, project_id: PROJECT_ID })
+      }).catch(() => {});
+    }
     window.__chatSessionId = sid;
-    fetch(`${SB_URL}/rest/v1/chat_sessions`, {
-      method: 'POST',
-      headers: { ...SB_HEADERS, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ id: sid, project_id: PROJECT_ID })
-    }).catch(() => {});
   } catch(e) {}
 
   // Live sync when admin saves in another tab

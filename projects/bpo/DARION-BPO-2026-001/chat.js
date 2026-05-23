@@ -1,75 +1,80 @@
 /* ── Knowledge Base ──────────────────────────────────────────── */
 // Built from project data + manual FAQs
-const KB = [
-  {
-    keys: ["hello","hi","hey","start","help"],
-    answer: "Hi! I'm the Darion project assistant for DARION-BPO-2026-001. Ask me about delivery phases, timelines, current status, client actions, or anything about this engagement."
-  },
-  {
-    keys: ["timeline","duration","how long","months","schedule","when finish","complete"],
-    answer: "This is an 8-month fixed-price delivery engagement. It runs across 7 phases from Discovery through Security Hardening & Handover. Phase M1 is complete and M2 (Platform Foundation) is currently at 68%."
-  },
-  {
-    keys: ["status","current","active","now","phase","which phase","what phase"],
-    answer: "Currently active: **CORE — Platform Foundation** (M2) at 68% complete. Authentication and base APIs are stable. RBAC, tenant isolation and CI/CD hardening are in progress. Next gate: Foundation sign-off."
-  },
-  {
-    keys: ["payment","cost","price","budget","amount","invoice","money","fee","commercial"],
-    answer: "Payment is milestone-based across 7 gates tied to delivery outcomes. You can see the full budget breakdown by clicking 'View budget breakdown' on the portal. The total engagement is ₹28L over 8 months."
-  },
-  {
-    keys: ["next","upcoming","next step","after","following"],
-    answer: "Next milestone is **Foundation sign-off** after RBAC and tenant isolation validation complete. Once signed off, Phase M3 (CRM & Case Management) begins. Your pending action: review and approve the access roles."
-  },
-  {
-    keys: ["action","my action","what do i","client action","required","pending","i need"],
-    answer: "Your current pending action: **Review access roles** for Phase 2 (CORE). RBAC and tenant isolation need your final role validation before foundation sign-off. Also, for Phase 3 (CRM), we'll need sample customer/case data from you."
-  },
-  {
-    keys: ["risk","risks","issue","problem","concern","blocking","delay"],
-    answer: "Current active risk: Delay in final user role approval can shift the foundation sign-off date. No other active risks. Phase 1 (Discovery) is risk-free and complete."
-  },
-  {
-    keys: ["crm","case","ticket","agent","customer","m3"],
-    answer: "Phase 3 (CRM, Case Management & Agent Workspace) is planned for Month 3. It covers customer profiles, ticket/case lifecycle, agent desktop, activity timeline, and search/filter. It starts after foundation sign-off. We'll need sample customer/case data from you."
-  },
-  {
-    keys: ["rbac","roles","permission","access","admin","supervisor"],
-    answer: "RBAC (Role-Based Access Control) maps four roles: Admin, Supervisor, Agent, and QA. This is being built in Phase 2 and needs your final role validation. Please review the RBAC draft when shared."
-  },
-  {
-    keys: ["devops","ci","cd","pipeline","deployment","deploy","infrastructure"],
-    answer: "CI/CD pipeline, environment separation, and secure repo rules are planned for completion in Phase 2 (CORE). Cloud/domain/provider decisions for production deployment will be needed from your side in Phase 7."
-  },
-  {
-    keys: ["discovery","scope","brd","frd","m1","phase 1","complete","done"],
-    answer: "Phase 1 (Discovery) is 100% complete. Deliverables: Signed scope baseline, role and permission matrix, architecture outline, and acceptance checklist. The BRD/FRD, role matrix and acceptance rules are all locked."
-  },
-  {
-    keys: ["wfm","workforce","shift","attendance","schedule","roster","m5","m6"],
-    answer: "Phase 5 (Workforce Management & QA Review System) covers shift creation, roster view, attendance tracking, QA scorecard builder, and supervisor views. Planned for Months 5–6. We'll need your shift policies and QA scorecard format before we begin."
-  },
-  {
-    keys: ["report","dashboard","analytics","bi","kpi","insight","m7"],
-    answer: "Phase 6 (Reports, Insights & Supervisor Command Center) is planned for Month 7. It covers case reports, agent productivity reports, WFM dashboards, QA summaries, and a supervisor command center. We'll need your confirmed KPI list."
-  },
-  {
-    keys: ["uat","testing","handover","go live","production","launch","m8","final"],
-    answer: "Phase 7 (Security Hardening, UAT, Deployment & Handover) is the final phase in Month 8. It covers security hardening, end-to-end UAT, deployment assistance, documentation, and knowledge transfer. Your cloud/domain/provider decision is needed before this phase."
-  },
-  {
-    keys: ["evidence","proof","deliverable","artifact","demo","document"],
-    answer: "For the current active phase (CORE), evidence includes: Login flow demo, API base structure, Repository workflow, and RBAC draft. All phase evidence is visible in each phase's detail panel on the portal."
-  },
-  {
-    keys: ["contact","reach","email","darion","team","support","help"],
-    answer: "For direct queries, you can reach the Darion delivery team at support@darion.in. Or use this chat — if I can't answer, I'll escalate directly to the team."
-  },
-  {
-    keys: ["acd","queue","routing","ivr","live","real time","operations","m4"],
-    answer: "Phase 4 (Queue, Basic ACD Rules & Live Operations View) handles work distribution, agent availability, basic routing logic, WebSocket live events, and a supervisor console. Planned for Month 4. We'll need your routing rules confirmed before build."
-  },
-];
+function getDynamicKB() {
+  const activePhase = (typeof PHASES !== 'undefined' && PHASES.length) ? (PHASES.find(p => p.status === 'In Progress') || PHASES[0]) : {code:'CORE', title:'Platform Foundation', month:'M2', progress:68, updateNote:'', clientAction:'Review access roles', decision:'', risks:['Delay in final user role approval can shift foundation sign-off'], evidence:['Login flow demo', 'API base structure', 'Repository workflow', 'RBAC draft']};
+  const m1 = (typeof PHASES !== 'undefined' && PHASES.length) ? PHASES.find(p => p.code === 'DISC') : null;
+  
+  return [
+    {
+      keys: ["hello","hi","hey","start","help"],
+      answer: "Hi! I'm the Darion project assistant for DARION-BPO-2026-001. Ask me about delivery phases, timelines, current status, client actions, or anything about this engagement."
+    },
+    {
+      keys: ["timeline","duration","how long","months","schedule","when finish","complete"],
+      answer: `This is an 8-month fixed-price delivery engagement. It runs across 7 phases from Discovery through Security Hardening & Handover. ${m1 && m1.status === 'Completed' ? 'Phase M1 is complete' : 'Phase M1 is ongoing'} and ${activePhase.code} (${activePhase.title}) is currently at ${activePhase.progress}%.`
+    },
+    {
+      keys: ["status","current","active","now","phase","which phase","what phase"],
+      answer: `Currently active: **${activePhase.code} — ${activePhase.title}** (${activePhase.month}) at ${activePhase.progress}% complete. ${activePhase.updateNote || ''}`
+    },
+    {
+      keys: ["payment","cost","price","budget","amount","invoice","money","fee","commercial"],
+      answer: "Payment is milestone-based across 7 gates tied to delivery outcomes. You can see the full budget breakdown by clicking 'View budget breakdown' on the portal. The total engagement is ₹28L over 8 months."
+    },
+    {
+      keys: ["next","upcoming","next step","after","following"],
+      answer: `After the current phase (${activePhase.code}) is signed off, the next planned phase will begin. Your current pending action: ${activePhase.clientAction || 'None'}.`
+    },
+    {
+      keys: ["action","my action","what do i","client action","required","pending","i need"],
+      answer: `Your current pending action: **${activePhase.clientAction || 'None'}**. ${activePhase.decision || ''}`
+    },
+    {
+      keys: ["risk","risks","issue","problem","concern","blocking","delay"],
+      answer: activePhase.risks && activePhase.risks.length ? `Current active risk: ${activePhase.risks[0]}.` : "No active risks for the current phase."
+    },
+    {
+      keys: ["crm","case","ticket","agent","customer","m3"],
+      answer: "Phase 3 (CRM, Case Management & Agent Workspace) is planned for Month 3. It covers customer profiles, ticket/case lifecycle, agent desktop, activity timeline, and search/filter."
+    },
+    {
+      keys: ["rbac","roles","permission","access","admin","supervisor"],
+      answer: "RBAC (Role-Based Access Control) maps four roles: Admin, Supervisor, Agent, and QA. This is being built in Phase 2."
+    },
+    {
+      keys: ["devops","ci","cd","pipeline","deployment","deploy","infrastructure"],
+      answer: "CI/CD pipeline, environment separation, and secure repo rules are handled in Phase 2 (CORE). Cloud/domain/provider decisions for production deployment will be needed in Phase 7."
+    },
+    {
+      keys: ["discovery","scope","brd","frd","m1","phase 1","complete","done"],
+      answer: "Phase 1 (Discovery) is complete. Deliverables: Signed scope baseline, role and permission matrix, architecture outline, and acceptance checklist."
+    },
+    {
+      keys: ["wfm","workforce","shift","attendance","schedule","roster","m5","m6"],
+      answer: "Phase 5 (Workforce Management & QA Review System) covers shift creation, roster view, attendance tracking, QA scorecard builder, and supervisor views."
+    },
+    {
+      keys: ["report","dashboard","analytics","bi","kpi","insight","m7"],
+      answer: "Phase 6 (Reports, Insights & Supervisor Command Center) is planned for Month 7. It covers case reports, agent productivity reports, WFM dashboards, QA summaries, and a supervisor command center."
+    },
+    {
+      keys: ["uat","testing","handover","go live","production","launch","m8","final"],
+      answer: "Phase 7 (Security Hardening, UAT, Deployment & Handover) is the final phase in Month 8. It covers security hardening, end-to-end UAT, deployment assistance, documentation, and knowledge transfer."
+    },
+    {
+      keys: ["evidence","proof","deliverable","artifact","demo","document"],
+      answer: `For the current active phase (${activePhase.code}), evidence includes: ${(activePhase.evidence || []).join(', ')}. All phase evidence is visible in the detail panel.`
+    },
+    {
+      keys: ["contact","reach","email","darion","team","support","help"],
+      answer: "For direct queries, you can reach the Darion delivery team at support@darion.in. Or use this chat — if I can't answer, I'll escalate directly to the team."
+    },
+    {
+      keys: ["acd","queue","routing","ivr","live","real time","operations","m4"],
+      answer: "Phase 4 (Queue, Basic ACD Rules & Live Operations View) handles work distribution, agent availability, basic routing logic, WebSocket live events, and a supervisor console."
+    },
+  ];
+}
 
 /* ── Score query against KB ────────────────────────────────────── */
 function matchKB(query) {
@@ -79,7 +84,7 @@ function matchKB(query) {
 
   let best = { score: 0, answer: null };
 
-  KB.forEach(entry => {
+  getDynamicKB().forEach(entry => {
     // How many query words hit any key in this entry?
     const matchedWords = words.filter(w =>
       entry.keys.some(k => w.includes(k) || k.includes(w))
@@ -104,7 +109,7 @@ async function askGemini(question) {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question, session_id: window.__chatSessionId || null })
+      body: JSON.stringify({ question, session_id: localStorage.getItem('bpo_chat_sid') || window.__chatSessionId || null })
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -120,7 +125,7 @@ async function sendToSupport(question) {
     body: JSON.stringify({
       question,
       ref: 'DARION-BPO-2026-001',
-      session_id: window.__chatSessionId || null
+      session_id: localStorage.getItem('bpo_chat_sid') || window.__chatSessionId || null
     })
   });
   return res.ok;
@@ -130,9 +135,43 @@ async function sendToSupport(question) {
 (function() {
   let isOpen = false;
   let pendingQuestion = '';
-  const messages = [
-    { role: 'ai', text: "Hi! I'm the Darion project assistant. Ask me about your BPO platform delivery — phases, timelines, actions, or anything about this engagement." }
-  ];
+  const messages = [];
+
+  async function loadHistory() {
+    const sid = localStorage.getItem('bpo_chat_sid') || window.__chatSessionId;
+    if (!sid) {
+      messages.push({ role: 'ai', text: "Hi! I'm the Darion project assistant. Ask me about your BPO platform delivery — phases, timelines, actions, or anything about this engagement." });
+      renderMessages();
+      return;
+    }
+    
+    try {
+      const res = await fetch(`https://tigxrqqykijkofgntway.supabase.co/rest/v1/chat_messages?session_id=eq.${sid}&order=created_at.asc`, {
+        headers: {
+          'apikey': 'sb_publishable_bty_r-Qe2gdS7k5KXIAOGw_DRtyaEJ8',
+          'Authorization': 'Bearer sb_publishable_bty_r-Qe2gdS7k5KXIAOGw_DRtyaEJ8'
+        }
+      });
+      if (res.ok) {
+        const msgs = await res.json();
+        if (msgs.length > 0) {
+          msgs.forEach(m => {
+            messages.push({ role: m.role, text: m.content, time: new Date(m.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) });
+          });
+        } else {
+          messages.push({ role: 'ai', text: "Hi! I'm the Darion project assistant. Ask me about your BPO platform delivery — phases, timelines, actions, or anything about this engagement." });
+        }
+        renderMessages();
+      } else {
+        throw new Error('Failed to load history');
+      }
+    } catch(e) {
+      if (messages.length === 0) {
+        messages.push({ role: 'ai', text: "Hi! I'm the Darion project assistant. Ask me about your BPO platform delivery — phases, timelines, actions, or anything about this engagement." });
+        renderMessages();
+      }
+    }
+  }
 
   function timeStr() {
     return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
@@ -286,8 +325,8 @@ async function sendToSupport(question) {
       <p class="chat-powered">Powered by Darion AI · support@darion.in</p>`;
     document.body.appendChild(panel);
 
-    // Render initial message
-    renderMessages();
+    // Load history or render initial message
+    loadHistory();
 
     // Toggle open/close
     fab.addEventListener('click', () => {
