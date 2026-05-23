@@ -254,6 +254,13 @@ function updateHeroStats() {
   document.getElementById("stat-tasks").textContent = `${done}/${allTasks.length}`;
 }
 
+/* ── Phase ID helper — handles both integer IDs (fallback) and UUID strings (Supabase) ── */
+function parsePhaseId(raw) {
+  // Try numeric first (hardcoded PHASES use 1,2,3…)
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : raw; // return string UUID if not a number
+}
+
 /* ── Stepper ──────────────────────────────────────────────────── */
 function renderStepper() {
   const el = document.getElementById("stepper");
@@ -288,8 +295,8 @@ function renderStepper() {
   }).join("");
 
   el.querySelectorAll(".step").forEach(el => {
-    el.addEventListener("click", () => selectPhase(parseInt(el.dataset.phaseId)));
-    el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") selectPhase(parseInt(el.dataset.phaseId)); });
+    el.addEventListener("click", () => selectPhase(parsePhaseId(el.dataset.phaseId)));
+    el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") selectPhase(parsePhaseId(el.dataset.phaseId)); });
   });
 }
 
@@ -327,7 +334,7 @@ function renderPhaseList() {
   `).join("");
 
   el.querySelectorAll(".phase-btn").forEach(btn => {
-    btn.addEventListener("click", () => selectPhase(parseInt(btn.dataset.phaseId)));
+    btn.addEventListener("click", () => selectPhase(parsePhaseId(btn.dataset.phaseId)));
   });
 }
 
