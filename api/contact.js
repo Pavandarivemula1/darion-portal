@@ -1,7 +1,26 @@
-// /api/contact.js — Email escalation to support@darion.in
-// Env vars required: MAIL_USER, MAIL_PASS (Gmail App Password)
-
+// /api/contact.js — Email escalation + Supabase logging
 import nodemailer from 'nodemailer';
+
+const SUPABASE_URL = 'https://tigxrqqykijkofgntway.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_bty_r-Qe2gdS7k5KXIAOGw_DRtyaEJ8';
+
+async function logEscalation(session_id, question, sent) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/chat_escalations`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        session_id: session_id || null,
+        question: question.slice(0, 1000),
+        email_sent: sent,
+        email_sent_at: sent ? new Date().toISOString() : null
+      })
+    });
+  } catch(e) {}
+}
 
 const reqLog = new Map();
 function isRateLimited(ip) {
@@ -24,7 +43,7 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: 'Too many requests. Please email support@darion.in directly.' });
   }
 
-  const { question, ref } = req.body || {};
+  const { question, ref, session_id } = req.body || {};
   if (!question || typeof question !== 'string' || question.trim().length < 3) {
     return res.status(400).json({ error: 'Invalid request' });
   }
@@ -80,6 +99,8 @@ export default async function handler(req, res) {
       `
     });
 
+    // Log escalation to Supabase
+    logEscalation(session_id, question, true);
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('Mail error:', err);

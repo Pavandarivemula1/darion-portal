@@ -1,6 +1,64 @@
-/* ── Data ─────────────────────────────────────────────────────── */
-// Read admin overrides from localStorage (set by admin page)
-function loadPhases() {
+/* ── Supabase config ────────────────────────────────────────── */
+const SB_URL = 'https://tigxrqqykijkofgntway.supabase.co';
+const SB_KEY = 'sb_publishable_bty_r-Qe2gdS7k5KXIAOGw_DRtyaEJ8';
+const SB_HEADERS = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` };
+const PROJECT_ID = 'DARION-BPO-2026-001';
+
+async function sbGet(path) {
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, { headers: SB_HEADERS });
+  if (!res.ok) throw new Error(`Supabase error ${res.status}`);
+  return res.json();
+}
+
+// Load phases + nested data from Supabase, fall back to hardcoded defaults
+async function loadFromSupabase() {
+  try {
+    const raw = await sbGet(
+      `phases?project_id=eq.${PROJECT_ID}&select=*,tasks(*),phase_risks(*),phase_evidence(*)&order=sort_order`
+    );
+    if (!raw || !raw.length) return null;
+    // Map snake_case DB cols → camelCase used by app
+    return raw.map(p => ({
+      id:           p.id,
+      code:         p.code,
+      month:        p.month,
+      title:        p.title,
+      status:       p.status,
+      health:       p.health,
+      progress:     p.progress,
+      amount:       p.amount,
+      owner:        p.owner,
+      clientAction: p.client_action,
+      decision:     p.decision,
+      updateNote:   p.update_note,
+      risks:        (p.phase_risks || []).sort((a,b)=>a.sort_order-b.sort_order).map(r=>r.description),
+      evidence:     (p.phase_evidence || []).sort((a,b)=>a.sort_order-b.sort_order).map(e=>e.description),
+      tasks:        (p.tasks || []).sort((a,b)=>a.sort_order-b.sort_order).map(t=>({
+        name: t.name, status: t.status, priority: t.priority, owner: t.owner
+      }))
+    }));
+  } catch(e) {
+    console.warn('Supabase unavailable, using local data:', e.message);
+    return null;
+  }
+}
+
+// Load payment gates from Supabase
+async function loadPaymentsFromSupabase() {
+  try {
+    const raw = await sbGet(
+      `payment_gates?project_id=eq.${PROJECT_ID}&order=sort_order`
+    );
+    if (!raw || !raw.length) return null;
+    return raw.map(p => ({
+      trigger: p.trigger_name, percent: p.percent,
+      amount: p.amount, outcome: p.outcome
+    }));
+  } catch(e) { return null; }
+}
+
+// Read admin localStorage overrides (admin panel saves here as immediate cache)
+function loadLocalOverrides() {
   try {
     const stored = localStorage.getItem('bpo_phases_001');
     if (stored) return JSON.parse(stored);
@@ -455,16 +513,32 @@ function setNavDate() {
 }
 
 /* ── Init ─────────────────────────────────────────────────────── */
-function init() {
-  // Merge localStorage overrides into PHASES
-  const overrides = loadPhases();
-  if (overrides) {
-    overrides.forEach(o => {
-      const idx = PHASES.findIndex(p => p.id === o.id);
-      if (idx !== -1) Object.assign(PHASES[idx], o);
-    });
-  }
+async function init() {
   setNavDate();
+
+  // 1) Try Supabase
+  const sbPhases = await loadFromSupabase();
+  if (sbPhases && sbPhases.length) {
+    PHASES.length = 0;
+    sbPhases.forEach(p => PHASES.push(p));
+  } else {
+    // 2) Fall back to localStorage overrides
+    const overrides = loadLocalOverrides();
+    if (overrides) {
+      overrides.forEach(o => {
+        const idx = PHASES.findIndex(p => p.id === o.id);
+        if (idx !== -1) Object.assign(PHASES[idx], o);
+      });
+    }
+  }
+
+  // Load payments from Supabase if available
+  const sbPayments = await loadPaymentsFromSupabase();
+  if (sbPayments && sbPayments.length) {
+    PAYMENTS.length = 0;
+    sbPayments.forEach(p => PAYMENTS.push(p));
+  }
+
   updateHeroStats();
   renderStepper();
   renderPhaseList();
@@ -472,6 +546,18 @@ function init() {
   renderPayments();
   initBudgetToggle();
   initSearch();
+
+  // Create a chat session ID for this page visit (used by chat widget for Supabase logging)
+  try {
+    const sid = crypto.randomUUID();
+    window.__chatSessionId = sid;
+    fetch(`${SB_URL}/rest/v1/chat_sessions`, {
+      method: 'POST',
+      headers: { ...SB_HEADERS, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ id: sid, project_id: PROJECT_ID })
+    }).catch(() => {});
+  } catch(e) {}
+
   // Live sync when admin saves in another tab
   window.addEventListener('storage', e => {
     if (e.key === 'bpo_phases_001') location.reload();
@@ -487,3 +573,4 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+

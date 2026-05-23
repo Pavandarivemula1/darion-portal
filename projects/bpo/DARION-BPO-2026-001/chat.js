@@ -90,7 +90,7 @@ async function askGemini(question) {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question })
+      body: JSON.stringify({ question, session_id: window.__chatSessionId || null })
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -103,7 +103,11 @@ async function sendToSupport(question) {
   const res = await fetch('/api/contact', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question, ref: 'DARION-BPO-2026-001' })
+    body: JSON.stringify({
+      question,
+      ref: 'DARION-BPO-2026-001',
+      session_id: window.__chatSessionId || null
+    })
   });
   return res.ok;
 }
