@@ -132,7 +132,7 @@ img,svg{display:block}
 
 /* ── Sidebar ───────────────────────────────────────────── */
 .phase-sidebar{background:var(--white);border:1px solid var(--g20)}
-@media(min-width:1056px){.phase-sidebar{position:sticky;top:56px}}
+@media(min-width:1056px){.phase-sidebar{position:sticky;top:56px;max-height:calc(100vh - 80px);overflow-y:auto}}
 
 .sidebar-header{padding:.875rem 1rem;border-bottom:1px solid var(--g20)}
 .sidebar-header p:first-child{font-size:14px;font-weight:600;color:var(--g100)}
