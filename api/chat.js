@@ -138,15 +138,6 @@ export default async function handler(req, res) {
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'AI not configured' });
 
-  // Log user message (fire-and-forget)
-  if (session_id) {
-    sbLog('chat_messages', {
-      session_id, role: 'user',
-      content: question.slice(0, 1000),
-      kb_matched: false, gemini_used: false
-    });
-  }
-
   try {
     // Build full context from DB every time (ensures live data)
     const sysPrompt = await getFullProjectContext();
@@ -162,8 +153,8 @@ export default async function handler(req, res) {
         );
         if (hRes.ok) {
           const past = await hRes.json();
-          // Reverse to chronological order, exclude the message we just logged
-          past.reverse().slice(0, -1).forEach(m => {
+          // Reverse to chronological order
+          past.reverse().forEach(m => {
             messagesPayload.push({
               role: m.role === 'ai' ? 'assistant' : 'user',
               content: m.content
@@ -173,7 +164,17 @@ export default async function handler(req, res) {
       } catch (e) { /* ignore history error */ }
     }
 
+    // Now push the current question
     messagesPayload.push({ role: 'user', content: question.slice(0, 1000) });
+
+    // Log user message in the background (fire-and-forget)
+    if (session_id) {
+      sbLog('chat_messages', {
+        session_id, role: 'user',
+        content: question.slice(0, 1000),
+        kb_matched: false, gemini_used: false
+      });
+    }
 
     const dsRes = await fetch(DEEPSEEK_URL, {
       method: 'POST',
