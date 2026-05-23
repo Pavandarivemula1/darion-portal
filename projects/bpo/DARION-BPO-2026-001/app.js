@@ -65,10 +65,13 @@ function loadLocalOverrides() {
   } catch(e) {}
   return null;
 }
+// NOTE: This hardcoded PHASES array is the FALLBACK only.
+// Supabase is the single source of truth — loaded in init().
+// Values here should reflect the ACTUAL project status as a best-effort offline fallback.
 const PHASES = [
   {
-    id: 1, code: "DISC", month: "M1", progress: 100,
-    status: "Completed", health: "Healthy", amount: "₹3.00L",
+    id: 1, code: "DISC", month: "M1", progress: 0,
+    status: "Planned", health: "Healthy", amount: "₹3.00L",
     title: "Discovery, Scope Lock & Delivery Blueprint",
     owner: "Business Analyst + Technical Lead",
     clientAction: "Approved",
@@ -77,16 +80,16 @@ const PHASES = [
     risks: ["No active risk"],
     evidence: ["Signed scope baseline", "Role and permission matrix", "Architecture outline", "Acceptance checklist"],
     tasks: [
-      { name: "SRS walkthrough and scope boundary confirmation", status: "Completed", priority: "P0", owner: "BA" },
-      { name: "BRD/FRD confirmation with module-wise acceptance rules", status: "Completed", priority: "P0", owner: "BA" },
-      { name: "User roles, permissions and tenant access model", status: "Completed", priority: "P0", owner: "Tech Lead" },
-      { name: "High-level architecture and data model draft", status: "Completed", priority: "P1", owner: "Tech Lead" },
-      { name: "Delivery governance, demo cadence and sign-off workflow", status: "Completed", priority: "P1", owner: "PM" },
+      { name: "SRS walkthrough and scope boundary confirmation", status: "Planned", priority: "P0", owner: "BA" },
+      { name: "BRD/FRD confirmation with module-wise acceptance rules", status: "Planned", priority: "P0", owner: "BA" },
+      { name: "User roles, permissions and tenant access model", status: "Planned", priority: "P0", owner: "Tech Lead" },
+      { name: "High-level architecture and data model draft", status: "Planned", priority: "P1", owner: "Tech Lead" },
+      { name: "Delivery governance, demo cadence and sign-off workflow", status: "Planned", priority: "P1", owner: "PM" },
     ],
   },
   {
-    id: 2, code: "CORE", month: "M2", progress: 68,
-    status: "In Progress", health: "Healthy", amount: "₹4.00L",
+    id: 2, code: "CORE", month: "M2", progress: 0,
+    status: "Planned", health: "Healthy", amount: "₹4.00L",
     title: "Platform Foundation, Access Control & DevOps Base",
     owner: "Backend + DevOps",
     clientAction: "Review access roles",
@@ -95,10 +98,10 @@ const PHASES = [
     risks: ["Delay in final user role approval can shift foundation sign-off"],
     evidence: ["Login flow demo", "API base structure", "Repository workflow", "RBAC draft"],
     tasks: [
-      { name: "Authentication, secure session and password flow", status: "Completed", priority: "P0", owner: "Backend" },
-      { name: "RBAC policy mapping for Admin, Supervisor, Agent and QA", status: "In Progress", priority: "P0", owner: "Backend" },
-      { name: "Tenant/account isolation and workspace boundaries", status: "In Progress", priority: "P0", owner: "Backend" },
-      { name: "Base API structure, error model and logging conventions", status: "Completed", priority: "P1", owner: "Backend" },
+      { name: "Authentication, secure session and password flow", status: "Planned", priority: "P0", owner: "Backend" },
+      { name: "RBAC policy mapping for Admin, Supervisor, Agent and QA", status: "Planned", priority: "P0", owner: "Backend" },
+      { name: "Tenant/account isolation and workspace boundaries", status: "Planned", priority: "P0", owner: "Backend" },
+      { name: "Base API structure, error model and logging conventions", status: "Planned", priority: "P1", owner: "Backend" },
       { name: "CI/CD pipeline, environment separation and secure repo rules", status: "Planned", priority: "P1", owner: "DevOps" },
     ],
   },
