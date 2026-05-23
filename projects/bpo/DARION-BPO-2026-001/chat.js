@@ -73,18 +73,32 @@ const KB = [
 
 /* ── Score query against KB ────────────────────────────────────── */
 function matchKB(query) {
-  const q = query.toLowerCase().replace(/[^\w\s]/g, ' ');
-  const words = q.split(/\s+/).filter(w => w.length > 2);
+  const q = query.toLowerCase().replace(/[^\w\s]/g, ' ').trim();
+  const words = q.split(/\s+/).filter(w => w.length > 1);
+  if (!words.length) return null;
+
   let best = { score: 0, answer: null };
+
   KB.forEach(entry => {
-    const hits = entry.keys.filter(k => words.some(w => w.includes(k) || k.includes(w))).length;
-    const score = hits / entry.keys.length;
+    // How many query words hit any key in this entry?
+    const matchedWords = words.filter(w =>
+      entry.keys.some(k => w.includes(k) || k.includes(w))
+    ).length;
+
+    // Also reward a direct substring match on the full query
+    const fullHit = entry.keys.some(k => q.includes(k)) ? 0.5 : 0;
+
+    // Score = max(matched_words / total_words, full_hit_bonus)
+    const score = Math.max(matchedWords / words.length, fullHit);
+
     if (score > best.score) best = { score, answer: entry.answer };
   });
-  return best.score >= 0.25 ? best.answer : null;
+
+  // Return answer if score is reasonable (≥ 0.4 or any full hit)
+  return best.score >= 0.4 ? best.answer : null;
 }
 
-/* ── Call Gemini via /api/chat ─────────────────────────────────── */
+/* ── Call DeepSeek AI via /api/chat ────────────────────────────── */
 async function askGemini(question) {
   try {
     const res = await fetch('/api/chat', {
