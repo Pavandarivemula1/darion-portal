@@ -147,6 +147,12 @@
     .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;background:var(--green-50);color:var(--white);padding:.75rem 1.25rem;font-size:13px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);transform:translateY(120%);transition:transform .3s ease;max-width:320px}
     .toast.show{transform:translateY(0)}
 
+    /* Status bar */
+    .status-bar{position:sticky;top:48px;z-index:90;padding:.5rem 1.25rem;font-size:12px;font-weight:500;transition:background .3s}
+    .status-bar.info{background:#e8daff;color:#6929c4}
+    .status-bar.ok{background:var(--green-10);color:var(--green-60)}
+    .status-bar.error{background:var(--red-10);color:var(--red-70)}
+
     /* Section hidden */
     .tab-section{display:none}
     .tab-section.active{display:block}
@@ -180,11 +186,14 @@
         <span class="nav-badge">Admin</span>
       </div>
       <div class="nav-right">
-        <a href="/projects/bpo/DARION-BPO-2026-001" class="nav-link">← Client view</a>
+        <a href="/projects/bpo/DARION-BPO-2026-001/index" class="nav-link">← Client view</a>
+        <button class="btn-add" id="reload-btn" style="height:32px;font-size:11px">↺ Reload DB</button>
         <button class="nav-logout" id="logout-btn">Sign out</button>
       </div>
     </div>
   </header>
+
+  <div id="status-bar" class="status-bar info">Connecting to Supabase…</div>
 
   <div class="main">
     <!-- Sidebar -->
@@ -196,8 +205,8 @@
         </div>
         <div id="phase-nav"></div>
         <div class="sidebar-footer">
-          <p class="sidebar-info">Changes save instantly to browser storage and sync to the client portal on reload.</p>
-          <button class="btn-ghost" id="reset-btn">↺ Reset all to defaults</button>
+          <p class="sidebar-info">All changes save directly to Supabase and reflect immediately on the client portal.</p>
+          <button class="btn-ghost" id="reload-btn" style="display:none">↺ Reload from DB</button>
         </div>
       </div>
     </aside>
