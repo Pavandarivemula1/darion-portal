@@ -15,11 +15,11 @@
     },
     {
       "source": "/projects/(.*)\\.css",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
     },
     {
       "source": "/projects/(.*)\\.js",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
     }
   ]
 }
