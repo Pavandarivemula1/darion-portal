@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <title>Admin · DARION-BPO-2026-001</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --blue-60:#0f62fe;--blue-70:#0043ce;--blue-10:#edf5ff;--blue-20:#d0e2ff;--blue-40:#78a9ff;
+      --g100:#161616;--g90:#262626;--g80:#393939;--g70:#525252;--g60:#6f6f6f;
+      --g30:#c6c6c6;--g20:#e0e0e0;--g10:#f4f4f4;--white:#fff;
+      --green-10:#defbe6;--green-50:#24a148;--green-60:#0e6027;
+      --red-10:#ffd7d9;--red-50:#da1e28;--red-70:#a2191f;
+      --yellow-10:#fff1c7;--yellow-40:#f1c21b;
+      --font:'IBM Plex Sans',sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font);background:var(--g10);color:var(--g100);font-size:14px;-webkit-font-smoothing:antialiased}
+    button{font-family:var(--font);cursor:pointer;border:none;background:none}
+    input,select,textarea{font-family:var(--font)}
+
+    /* Lock */
+    #lock-screen{position:fixed;inset:0;z-index:999;background:var(--g100);display:flex;align-items:center;justify-content:center;padding:1rem}
+    .lock-box{background:var(--g90);border:1px solid var(--g80);padding:2rem;width:100%;max-width:360px}
+    .lock-logo{font-size:16px;font-weight:600;color:var(--white);margin-bottom:.25rem}
+    .lock-logo span{color:var(--blue-40)}
+    .lock-sub{font-size:12px;color:var(--g60);margin-bottom:2rem}
+    .lock-label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--g30);margin-bottom:.5rem}
+    .lock-input{width:100%;height:44px;background:var(--g80);border:none;border-bottom:2px solid var(--g60);color:var(--white);font-family:var(--font);font-size:14px;padding:0 .875rem;outline:none;letter-spacing:.06em;transition:border-color .18s}
+    .lock-input:focus{border-bottom-color:var(--blue-40)}
+    .lock-btn{width:100%;height:44px;margin-top:1.125rem;background:var(--blue-60);color:var(--white);font-size:14px;font-weight:500;border:none;cursor:pointer;transition:background .18s}
+    .lock-btn:hover{background:var(--blue-70)}
+    .lock-error{font-size:12px;color:#ff8389;margin-top:.625rem;min-height:18px}
+
+    /* Shell */
+    #admin-shell{display:none}
+
+    /* Nav */
+    .nav{position:sticky;top:0;z-index:100;background:var(--g90);border-bottom:1px solid var(--g80);height:48px}
+    .nav-inner{max-width:1440px;margin:0 auto;padding:0 1.25rem;display:flex;align-items:center;justify-content:space-between;height:100%}
+    .nav-left{display:flex;align-items:center;gap:.75rem}
+    .nav-logo{font-size:14px;font-weight:600;color:var(--white)}
+    .nav-logo span{color:var(--blue-40)}
+    .nav-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;background:#6929c4;color:#e8daff;padding:2px 8px}
+    .nav-right{display:flex;align-items:center;gap:1.25rem}
+    .nav-link{font-size:12px;color:var(--g60);text-decoration:none;transition:color .18s}
+    .nav-link:hover{color:var(--white)}
+    .nav-logout{font-size:12px;color:var(--g60);background:none;border:none;font-family:var(--font);cursor:pointer;transition:color .18s}
+    .nav-logout:hover{color:var(--white)}
+
+    /* Layout */
+    .main{max-width:1440px;margin:0 auto;padding:1.25rem;display:grid;gap:1.25rem}
+    @media(min-width:1056px){.main{grid-template-columns:280px 1fr;align-items:start;padding:1.5rem 2rem}}
+
+    /* Sidebar */
+    .sidebar{background:var(--white);border:1px solid var(--g20)}
+    @media(min-width:1056px){.sidebar{position:sticky;top:56px}}
+    .sidebar-hd{padding:.875rem 1rem;border-bottom:1px solid var(--g20);display:flex;align-items:center;justify-content:space-between}
+    .sidebar-hd-title{font-size:13px;font-weight:600;color:var(--g100)}
+    .add-phase-btn{height:28px;padding:0 .75rem;background:var(--blue-60);color:var(--white);font-size:11px;font-weight:500;border:none;cursor:pointer;transition:background .18s;white-space:nowrap}
+    .add-phase-btn:hover{background:var(--blue-70)}
+
+    .phase-nav-btn{display:block;width:100%;text-align:left;padding:.75rem 1rem;border-bottom:1px solid var(--g20);background:var(--white);border-left:3px solid transparent;cursor:pointer;transition:background .18s,border-color .18s;min-height:44px;font-family:var(--font)}
+    .phase-nav-btn:last-child{border-bottom:none}
+    .phase-nav-btn:hover{background:var(--g10)}
+    .phase-nav-btn.active{border-left-color:var(--blue-60);background:var(--blue-10)}
+    .pnb-meta{font-size:10px;color:var(--g60);margin-bottom:.2rem}
+    .pnb-title{font-size:12px;color:var(--g100);line-height:1.35}
+    .pnb-status{font-size:10px;margin-top:.2rem}
+
+    .sidebar-footer{padding:.875rem;border-top:1px solid var(--g20);display:flex;flex-direction:column;gap:.5rem}
+    .sidebar-info{font-size:11px;color:var(--g60);line-height:1.6}
+    .btn-ghost{height:36px;width:100%;padding:0 .75rem;border:1px solid var(--g30);color:var(--g70);font-size:12px;background:var(--white);cursor:pointer;transition:background .18s;font-family:var(--font)}
+    .btn-ghost:hover{background:var(--g10)}
+
+    /* Section tabs */
+    .section-tabs{display:flex;border-bottom:2px solid var(--g20);margin-bottom:1.25rem;background:var(--white);border:1px solid var(--g20);border-bottom:none}
+    .tab-btn{height:44px;padding:0 1.25rem;font-size:13px;font-family:var(--font);color:var(--g70);cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;transition:color .18s,border-color .18s;white-space:nowrap}
+    .tab-btn:hover{color:var(--g100)}
+    .tab-btn.active{color:var(--blue-60);border-bottom-color:var(--blue-60)}
+
+    /* Cards */
+    .card{background:var(--white);border:1px solid var(--g20);padding:1.25rem;margin-bottom:1.25rem}
+    .card:last-child{margin-bottom:0}
+    .card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem}
+    .card-title{font-size:15px;font-weight:500;color:var(--g100)}
+    .card-sub{font-size:12px;color:var(--g60);margin-top:.125rem}
+
+    /* Form */
+    .fg{display:grid;gap:.875rem}
+    .fg-2{grid-template-columns:1fr 1fr}
+    .fg-3{grid-template-columns:repeat(3,1fr)}
+    @media(max-width:639px){.fg-2,.fg-3{grid-template-columns:1fr}}
+    .ff{display:flex;flex-direction:column;gap:.375rem}
+    .fl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--g60)}
+    .fi,.fs,.fta{font-family:var(--font);font-size:13px;color:var(--g100);background:var(--g10);border:none;border-bottom:1px solid var(--g60);padding:0 .75rem;outline:none;width:100%;transition:border-color .18s}
+    .fi{height:38px}
+    .fs{height:38px;cursor:pointer}
+    .fta{padding:.5rem .75rem;resize:vertical;min-height:72px;line-height:1.5}
+    .fi:focus,.fs:focus,.fta:focus{border-bottom-color:var(--blue-60)}
+    .progress-range{width:100%;accent-color:var(--blue-60);margin-top:.375rem;height:4px}
+
+    /* Dynamic lists */
+    .dyn-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem}
+    .dyn-item{display:flex;gap:.5rem;align-items:center}
+    .dyn-item .fi{flex:1}
+    .del-item-btn{width:32px;height:32px;flex-shrink:0;background:var(--red-10);color:var(--red-70);border:1px solid #ffd7d9;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .18s;font-size:16px;line-height:1}
+    .del-item-btn:hover{background:#ffd7d9}
+    .add-item-btn{height:32px;padding:0 .875rem;border:1px solid var(--blue-60);color:var(--blue-60);font-size:12px;font-family:var(--font);background:var(--white);cursor:pointer;transition:background .18s,color .18s;width:fit-content}
+    .add-item-btn:hover{background:var(--blue-60);color:var(--white)}
+
+    /* Tasks */
+    .task-row{display:grid;gap:.5rem;border:1px solid var(--g20);padding:.75rem;background:var(--g10);margin-bottom:.5rem}
+    @media(min-width:768px){.task-row{grid-template-columns:1fr 80px 110px 130px 36px;align-items:center}}
+    .task-row:last-child{margin-bottom:0}
+
+    /* Payment rows */
+    .pay-row{display:grid;gap:.5rem;border:1px solid var(--g20);padding:.75rem;background:var(--g10);margin-bottom:.5rem}
+    @media(min-width:768px){.pay-row{grid-template-columns:1fr 80px 120px 1fr 36px;align-items:center}}
+    .pay-row:last-child{margin-bottom:0}
+
+    /* Buttons */
+    .btn-primary{height:40px;min-width:120px;padding:0 1.25rem;background:var(--blue-60);color:var(--white);font-size:13px;font-weight:500;border:none;cursor:pointer;transition:background .18s;font-family:var(--font)}
+    .btn-primary:hover{background:var(--blue-70)}
+    .btn-danger{height:36px;padding:0 .875rem;background:var(--red-10);color:var(--red-70);border:1px solid #ffd7d9;font-size:12px;font-family:var(--font);cursor:pointer;transition:background .18s}
+    .btn-danger:hover{background:var(--red-50);color:var(--white);border-color:var(--red-50)}
+    .btn-danger.full-danger{background:var(--red-50);color:var(--white);border-color:var(--red-50)}
+    .btn-danger.full-danger:hover{background:#a2191f}
+    .btn-add{height:36px;padding:0 1rem;border:1px solid var(--blue-60);color:var(--blue-60);font-size:12px;font-family:var(--font);background:var(--white);cursor:pointer;transition:background .18s,color .18s}
+    .btn-add:hover{background:var(--blue-60);color:var(--white)}
+
+    /* Save bar */
+    .save-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:1.25rem}
+    .save-msg{font-size:12px;color:var(--green-60);font-weight:500;min-height:18px}
+
+    /* Danger zone */
+    .danger-zone{border:1px solid #ffd7d9;background:var(--red-10);padding:1.25rem;margin-top:1.25rem}
+    .danger-zone-title{font-size:13px;font-weight:600;color:var(--red-70);margin-bottom:.5rem}
+    .danger-zone-desc{font-size:12px;color:var(--g70);margin-bottom:.875rem;line-height:1.5}
+
+    /* Toast */
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;background:var(--green-50);color:var(--white);padding:.75rem 1.25rem;font-size:13px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);transform:translateY(120%);transition:transform .3s ease;max-width:320px}
+    .toast.show{transform:translateY(0)}
+
+    /* Section hidden */
+    .tab-section{display:none}
+    .tab-section.active{display:block}
+
+    .divider{border:none;border-top:1px solid var(--g20);margin:1.25rem 0}
+    .empty-msg{font-size:13px;color:var(--g60);padding:.75rem;background:var(--g10);border:1px dashed var(--g30);text-align:center}
+
+    :focus-visible{outline:2px solid var(--blue-60);outline-offset:2px}
+  </style>
+</head>
+<body>
+
+<!-- Lock -->
+<div id="lock-screen">
+  <div class="lock-box">
+    <p class="lock-logo">DARION<span>OS</span></p>
+    <p class="lock-sub">Admin panel · DARION-BPO-2026-001</p>
+    <label class="lock-label" for="pw-input">Access key</label>
+    <input type="password" id="pw-input" class="lock-input" placeholder="Enter access key" autocomplete="off"/>
+    <button class="lock-btn" id="pw-submit">Unlock</button>
+    <p class="lock-error" id="lock-error"></p>
+  </div>
+</div>
+
+<!-- Admin -->
+<div id="admin-shell">
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <span class="nav-logo">DARION<span>OS</span></span>
+        <span class="nav-badge">Admin</span>
+      </div>
+      <div class="nav-right">
+        <a href="../" class="nav-link">← Client view</a>
+        <button class="nav-logout" id="logout-btn">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="main">
+    <!-- Sidebar -->
+    <aside>
+      <div class="sidebar">
+        <div class="sidebar-hd">
+          <span class="sidebar-hd-title">Phases</span>
+          <button class="add-phase-btn" id="add-phase-btn">+ Add phase</button>
+        </div>
+        <div id="phase-nav"></div>
+        <div class="sidebar-footer">
+          <p class="sidebar-info">Changes save instantly to browser storage and sync to the client portal on reload.</p>
+          <button class="btn-ghost" id="reset-btn">↺ Reset all to defaults</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Edit area -->
+    <div id="edit-area">
+      <p style="color:var(--g60);font-size:14px;padding:1rem">Select a phase to edit.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ Saved — client view updated</div>
+<script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>DARION-BPO-2026-001 · Omnichannel BPO Platform · Delivery Tracker</title>
+  <meta name="description" content="Live delivery progress for the Omnichannel BPO Platform engagement. Milestone status, evidence, risks and payment gates." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="chat.css" />
+</head>
+<body>
+
+  <!-- ── Top Nav ───────────────────────────────────────────── -->
+  <header class="top-nav" role="banner">
+    <div class="container">
+      <div class="nav-brand">
+        <span class="nav-logo">DARION<span>OS</span></span>
+        <span class="nav-ref">DARION-BPO-2026-001</span>
+      </div>
+      <span class="nav-date" id="nav-date"></span>
+    </div>
+  </header>
+
+  <!-- ── Hero ─────────────────────────────────────────────── -->
+  <section class="hero" aria-label="Project overview">
+    <div class="container">
+      <div class="hero-inner">
+        <div>
+          <p class="hero-eyebrow">Client progress room</p>
+          <h1 class="hero-title">Omnichannel BPO<br>Platform Delivery</h1>
+          <p class="hero-desc">
+            Milestone status, client actions, evidence, risks and payment gates — one controlled view for the full 8-month engagement.
+          </p>
+          <div class="overall-progress-wrap">
+            <div class="overall-bar-label">
+              <span>Overall delivery progress</span>
+              <span id="hero-pct">—</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="hero-bar" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="stat-grid" aria-label="Key statistics">
+          <div class="stat-tile">
+            <p class="tile-label">Overall completion</p>
+            <p class="tile-value" id="stat-overall">—</p>
+            <p class="tile-helper">Across all seven phases</p>
+          </div>
+          <div class="stat-tile">
+            <p class="tile-label">Active phase</p>
+            <p class="tile-value" id="stat-phase">—</p>
+            <p class="tile-helper" id="stat-phase-status">—</p>
+          </div>
+          <div class="stat-tile">
+            <p class="tile-label">Tasks completed</p>
+            <p class="tile-value" id="stat-tasks">—</p>
+            <p class="tile-helper">Low-level delivery items</p>
+          </div>
+          <div class="stat-tile">
+            <p class="tile-label">Engagement value</p>
+            <p class="tile-value">₹28L</p>
+            <p class="tile-helper">8-month fixed delivery</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Phase Stepper ────────────────────────────────────── -->
+  <section class="stepper-section" aria-label="Phase timeline">
+    <div class="container">
+      <div class="stepper-inner">
+        <p class="stepper-label">Delivery timeline</p>
+        <div class="stepper" id="stepper" role="tablist" aria-label="Delivery phases"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Main Content ──────────────────────────────────────── -->
+  <main class="main-section container" id="main-content">
+    <div class="main-grid">
+
+      <!-- Phase Sidebar -->
+      <aside aria-label="Phase navigator">
+        <div class="phase-sidebar">
+          <div class="sidebar-header">
+            <p class="heading-01">Delivery phases</p>
+            <p class="body-01" style="margin-top:0.25rem;font-size:12px;">Select a phase to review details.</p>
+          </div>
+          <div class="sidebar-search-wrap">
+            <input
+              type="search"
+              class="sidebar-search"
+              id="phase-search"
+              placeholder="Search phases…"
+              aria-label="Search phases"
+            />
+          </div>
+          <div id="phase-list" role="tablist" aria-label="Phase list"></div>
+        </div>
+      </aside>
+
+      <!-- Detail Panel -->
+      <div id="detail-panel" aria-live="polite" aria-label="Phase details">
+        <!-- Rendered by JS -->
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ── Budget Gate ───────────────────────────────────────── -->
+  <section class="budget-section container" aria-label="Budget structure">
+    <div class="budget-card">
+      <p class="section-eyebrow">Commercial governance</p>
+      <h2 class="budget-title">Budget Structure</h2>
+      <p class="budget-summary">
+        This engagement operates on a milestone-based payment model. Seven payment gates are tied directly to verified delivery outcomes — each release requires sign-off on the corresponding phase before it is triggered. Commercial terms are structured to protect both parties across the full 8-month delivery window.
+      </p>
+      <div class="budget-pills">
+        <span class="budget-pill">7 payment milestones</span>
+        <span class="budget-pill">Outcome-linked triggers</span>
+        <span class="budget-pill">Fixed-price engagement</span>
+        <span class="budget-pill">Phase sign-off required</span>
+      </div>
+      <button
+        class="budget-toggle-btn"
+        id="budget-toggle"
+        aria-expanded="false"
+        aria-controls="budget-content"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 10L3 5h10L8 10z" fill="currentColor"/>
+        </svg>
+        View budget breakdown
+      </button>
+
+      <div class="budget-content" id="budget-content" role="region" aria-label="Budget breakdown">
+        <div class="budget-content-inner">
+          <div class="table-wrap">
+            <table aria-label="Payment schedule">
+              <thead>
+                <tr>
+                  <th>Payment trigger</th>
+                  <th>%</th>
+                  <th>Amount</th>
+                  <th>Linked delivery outcome</th>
+                </tr>
+              </thead>
+              <tbody id="payment-tbody"></tbody>
+            </table>
+          </div>
+          <p class="budget-note">
+            All amounts in Indian Rupees (INR). Payment is due within 7 business days of milestone sign-off. This schedule forms part of the commercial agreement.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ────────────────────────────────────────────── -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          <p class="footer-brand">DARION<span>OS</span> · Delivery Platform</p>
+          <p class="footer-ref" style="margin-top:0.35rem;">Project ref: DARION-BPO-2026-001</p>
+        </div>
+        <div class="footer-meta">
+          <p>Prepared by Darion Technologies</p>
+          <p style="margin-top:0.25rem;">This document is confidential and intended for the named recipient only.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="chat.js"></script>
+</body>
+</html>

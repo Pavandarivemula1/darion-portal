@@ -1,0 +1,10 @@
+{
+  "name": "darionos-portal",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Darion client delivery portal — DARION-BPO-2026-001",
+  "dependencies": {
+    "nodemailer": "^6.9.13"
+  }
+}
