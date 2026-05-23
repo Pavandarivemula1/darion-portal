@@ -25,9 +25,10 @@ let saving    = false;
 
 /* ── Supabase API ─────────────────────────────────────── */
 async function sbFetch(path, opts = {}) {
+  const { headers: customHeaders = {}, ...restOpts } = opts;
   const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
-    headers: { ...SB_HDR, ...(opts.headers || {}) },
-    ...opts
+    headers: { ...SB_HDR, ...customHeaders },
+    ...restOpts
   });
   if (!res.ok) {
     const err = await res.text().catch(() => res.status);
