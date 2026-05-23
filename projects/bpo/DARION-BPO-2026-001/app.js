@@ -233,7 +233,7 @@ function esc(str) {
 }
 
 /* ── State ────────────────────────────────────────────────────── */
-let activePhaseId = 2; // default: In Progress phase
+let activePhaseId = 1; // default: In Progress phase, or first phase
 let searchQuery = "";
 
 /* ── Hero Stats ───────────────────────────────────────────────── */
