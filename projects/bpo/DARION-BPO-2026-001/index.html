@@ -16,7 +16,7 @@
     // Auth guard — redirect to login if not authenticated
     (function() {
       if (!sessionStorage.getItem('bpo_auth')) {
-        window.location.replace('login');
+        window.location.replace('/projects/bpo/DARION-BPO-2026-001/login');
       }
     })();
   </script>
@@ -32,7 +32,7 @@
       </div>
       <div style="display:flex;align-items:center;gap:1rem">
         <span class="nav-date" id="nav-date"></span>
-        <button id="logout-btn" onclick="sessionStorage.clear();window.location.replace('login')" style="font-size:11px;color:var(--g60);background:none;border:none;cursor:pointer;padding:.25rem .5rem;font-family:inherit" title="Sign out">Sign out</button>
+        <button id="logout-btn" onclick="sessionStorage.clear();window.location.replace('/projects/bpo/DARION-BPO-2026-001/login')" style="font-size:11px;color:var(--g60);background:none;border:none;cursor:pointer;padding:.25rem .5rem;font-family:inherit" title="Sign out">Sign out</button>
       </div>
     </div>
   </header>

@@ -274,9 +274,8 @@
         // Store auth state
         sessionStorage.setItem('bpo_auth', btoa(`${user}:${pass}`));
         sessionStorage.setItem('bpo_auth_user', user);
-        // Redirect to dashboard
-        const base = window.location.pathname.replace('login', '').replace(/\/+$/, '');
-        window.location.href = base + '/';
+        // Redirect directly to the dashboard index using an explicit absolute path
+        window.location.href = '/projects/bpo/DARION-BPO-2026-001/index';
       } else {
         spinner.style.display = 'none';
         label.textContent = 'Sign in';
@@ -287,10 +286,9 @@
       }
     });
 
-    // If already logged in, redirect
+    // If already logged in, redirect to dashboard
     if (sessionStorage.getItem('bpo_auth')) {
-      const base = window.location.pathname.replace('login', '').replace(/\/+$/, '');
-      window.location.href = base + '/';
+      window.location.href = '/projects/bpo/DARION-BPO-2026-001/index';
     }
   </script>
 </body>

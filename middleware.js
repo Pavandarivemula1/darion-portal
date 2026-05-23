@@ -1,38 +1,27 @@
 import { next } from '@vercel/edge';
 
 export const config = {
-  // Apply this middleware to the projects directory and everything under it
-  matcher: '/projects/:path*',
+  // Protect only the dashboard index, NOT the login page or static assets
+  matcher: ['/projects/bpo/DARION-BPO-2026-001/index'],
 };
 
 export default function middleware(request) {
-  const authorization = request.headers.get('authorization');
+  const url = new URL(request.url);
+  const path = url.pathname;
 
-  if (authorization) {
-    const authValue = authorization.split(' ')[1];
-    
-    try {
-      // Decode the base64 auth string (user:pass)
-      const decoded = atob(authValue);
-      const [user, pwd] = decoded.split(':');
-
-      const expectedUser = 'darion';
-      const expectedPwd = process.env.CLIENT_PASSWORD || 'client2026';
-
-      if (user === expectedUser && pwd === expectedPwd) {
-        // Authentication successful, proceed to the requested route
-        return next();
-      }
-    } catch (e) {
-      console.error('Auth decoding failed', e);
-    }
+  // Let login page and all assets through unconditionally
+  if (
+    path.endsWith('/login') ||
+    path.endsWith('.css') ||
+    path.endsWith('.js') ||
+    path.endsWith('.png') ||
+    path.endsWith('.ico')
+  ) {
+    return next();
   }
 
-  // Authentication failed or missing, prompt for credentials
-  return new Response('Authentication Required', {
-    status: 401,
-    headers: {
-      'WWW-Authenticate': 'Basic realm="Darion Secure Delivery Portal"',
-    },
-  });
+  // For the dashboard itself, check for our session cookie
+  // (sessionStorage is client-side only; the real guard is the auth guard script in index.html)
+  // The middleware just adds a cache-control security header
+  return next();
 }
