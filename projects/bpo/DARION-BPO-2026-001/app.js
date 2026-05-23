@@ -522,10 +522,9 @@ async function init() {
   if (sbPhases && sbPhases.length) {
     PHASES.length = 0;
     sbPhases.forEach(p => PHASES.push(p));
-    // Auto-select the first In Progress phase from real DB data
-    const inProgress = PHASES.find(p => p.status === 'In Progress');
-    if (inProgress) activePhaseId = inProgress.id;
-    else activePhaseId = PHASES[0].id;
+    // Auto-select the active phase based on real DB data
+    const active = PHASES.find(p => p.status === 'In Progress') || PHASES.find(p => p.status !== 'Completed') || PHASES[0];
+    activePhaseId = active ? active.id : 1;
   } else {
     // 2) Fall back to localStorage overrides
     const overrides = loadLocalOverrides();
@@ -535,8 +534,8 @@ async function init() {
         if (idx !== -1) Object.assign(PHASES[idx], o);
       });
     }
-    const inProgress = PHASES.find(p => p.status === 'In Progress');
-    if (inProgress) activePhaseId = inProgress.id;
+    const active = PHASES.find(p => p.status === 'In Progress') || PHASES.find(p => p.status !== 'Completed') || PHASES[0];
+    activePhaseId = active ? active.id : 1;
   }
 
   // Load payments from Supabase if available
