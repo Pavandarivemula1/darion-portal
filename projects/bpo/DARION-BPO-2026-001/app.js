@@ -523,12 +523,13 @@ async function init() {
   // 1) Try Supabase — this is the source of truth
   const sbPhases = await loadFromSupabase();
   if (sbPhases && sbPhases.length) {
+    // Sort by sort_order ascending before pushing so PHASES[0] is always M1-DISC
+    sbPhases.sort((a, b) => (a.sort_order ?? a.id) - (b.sort_order ?? b.id));
     PHASES.length = 0;
     sbPhases.forEach(p => PHASES.push(p));
-    // Auto-select the active phase based on real DB data
-    const sorted = [...PHASES].sort((a, b) => (a.sort_order ?? a.id) - (b.sort_order ?? b.id));
-    const active = sorted.find(p => p.status === 'In Progress') || sorted.find(p => p.status !== 'Completed') || sorted[0];
-    activePhaseId = active ? active.id : (PHASES[0] ? PHASES[0].id : 1);
+    // Pick In Progress if exists, otherwise always default to first (M1-DISC)
+    const inProgress = PHASES.find(p => p.status === 'In Progress');
+    activePhaseId = inProgress ? inProgress.id : PHASES[0].id;
   } else {
     // 2) Fall back to localStorage overrides
     const overrides = loadLocalOverrides();
@@ -538,9 +539,9 @@ async function init() {
         if (idx !== -1) Object.assign(PHASES[idx], o);
       });
     }
-    const sorted = [...PHASES].sort((a, b) => (a.sort_order ?? a.id) - (b.sort_order ?? b.id));
-    const active = sorted.find(p => p.status === 'In Progress') || sorted.find(p => p.status !== 'Completed') || sorted[0];
-    activePhaseId = active ? active.id : (PHASES[0] ? PHASES[0].id : 1);
+    // Hardcoded PHASES array is already sorted M1→M8, default to In Progress or first
+    const inProgress = PHASES.find(p => p.status === 'In Progress');
+    activePhaseId = inProgress ? inProgress.id : PHASES[0].id;
   }
 
   // Load payments from Supabase if available

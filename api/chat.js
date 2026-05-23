@@ -136,8 +136,7 @@ export default async function handler(req, res) {
   if (!question || typeof question !== 'string' || question.trim().length < 2)
     return res.status(400).json({ error: 'Invalid question' });
 
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'AI not configured' });
+  const apiKey = process.env.DEEPSEEK_API_KEY || 'sk-f08be9ba8a50475cacd50af73db858fa';
 
   try {
     // Build full context from DB every time (ensures live data)
