@@ -2,7 +2,8 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/", "destination": "/projects/bpo/DARION-BPO-2026-001", "permanent": false }
+    { "source": "/", "destination": "/projects/bpo/DARION-BPO-2026-001/login", "permanent": false },
+    { "source": "/projects/bpo/DARION-BPO-2026-001", "destination": "/projects/bpo/DARION-BPO-2026-001/login", "permanent": false }
   ],
   "headers": [
     {

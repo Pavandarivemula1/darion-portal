@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Client Login · DARION-BPO-2026-001</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue-60:#0f62fe; --blue-70:#0043ce; --blue-10:#edf5ff; --blue-20:#d0e2ff; --blue-40:#78a9ff;
+      --g100:#161616; --g90:#262626; --g80:#393939; --g70:#525252; --g60:#6f6f6f;
+      --g30:#c6c6c6; --g20:#e0e0e0; --g10:#f4f4f4; --white:#ffffff;
+      --green-50:#24a148; --red-10:#ffd7d9; --red-70:#a2191f;
+      --font:'IBM Plex Sans',sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      font-family: var(--font);
+      background: var(--g100);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Background Grid ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(15,98,254,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15,98,254,0.05) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    /* ── Top bar ── */
+    .top-bar {
+      height: 48px;
+      border-bottom: 1px solid var(--g80);
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .nav-logo { font-size: 14px; font-weight: 600; color: var(--white); letter-spacing: .02em; }
+    .nav-logo span { color: var(--blue-40); }
+
+    /* ── Center wrap ── */
+    .page-center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-card {
+      background: var(--g90);
+      border: 1px solid var(--g80);
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+    }
+
+    .card-eyebrow {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--blue-40);
+      margin-bottom: .875rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .card-eyebrow::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--blue-60);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .4; transform: scale(.7); }
+    }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 300;
+      color: var(--white);
+      margin-bottom: .375rem;
+    }
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--g60);
+      margin-bottom: 1.75rem;
+      line-height: 1.5;
+    }
+
+    /* ── Form ── */
+    .field { margin-bottom: 1.125rem; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--g30);
+      margin-bottom: .4rem;
+    }
+    .field input {
+      width: 100%;
+      height: 44px;
+      background: var(--g80);
+      border: none;
+      border-bottom: 2px solid var(--g70);
+      color: var(--white);
+      font-family: var(--font);
+      font-size: 14px;
+      padding: 0 .875rem;
+      outline: none;
+      transition: border-color .18s ease;
+    }
+    .field input:focus { border-bottom-color: var(--blue-60); }
+    .field input::placeholder { color: var(--g60); }
+
+    /* ── Error ── */
+    .error-msg {
+      display: none;
+      background: var(--red-10);
+      color: var(--red-70);
+      font-size: 12px;
+      padding: .6rem .875rem;
+      margin-bottom: 1.125rem;
+      border-left: 3px solid var(--red-70);
+    }
+    .error-msg.show { display: block; }
+
+    /* ── Button ── */
+    .login-btn {
+      width: 100%;
+      height: 48px;
+      background: var(--blue-60);
+      color: var(--white);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      letter-spacing: .02em;
+      transition: background .18s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+    }
+    .login-btn:hover:not(:disabled) { background: var(--blue-70); }
+    .login-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Footer note ── */
+    .card-footer {
+      margin-top: 1.5rem;
+      padding-top: 1.125rem;
+      border-top: 1px solid var(--g80);
+      font-size: 11px;
+      color: var(--g60);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* ── Bottom bar ── */
+    .bottom-bar {
+      height: 40px;
+      border-top: 1px solid var(--g80);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--g60);
+      letter-spacing: .04em;
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <header class="top-bar">
+    <span class="nav-logo">DARION<span>OS</span></span>
+  </header>
+
+  <div class="page-center">
+    <div class="login-card">
+      <p class="card-eyebrow">Secure delivery portal</p>
+      <h1 class="card-title">Client Access</h1>
+      <p class="card-subtitle">DARION-BPO-2026-001 · Enter your credentials to view the delivery dashboard.</p>
+
+      <div class="error-msg" id="error-msg">Invalid credentials. Please check your username and password.</div>
+
+      <form id="login-form" autocomplete="off" novalidate>
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="your-username" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="login-btn" id="login-btn">
+          <span id="btn-label">Sign in</span>
+          <span class="spinner" id="btn-spinner"></span>
+        </button>
+      </form>
+
+      <div class="card-footer">
+        This portal is confidential and intended for the named client only.<br>
+        Contact <strong style="color:var(--blue-40)">support@darion.in</strong> if you need access.
+      </div>
+    </div>
+  </div>
+
+  <footer class="bottom-bar">
+    DARION TECHNOLOGIES · SECURE DELIVERY PLATFORM
+  </footer>
+
+  <script>
+    /* ── Valid credentials (client-side gate, backend middleware is the real lock) ── */
+    const VALID_USERS = [
+      { user: 'darion', pass: 'client2026' },
+      { user: 'client', pass: 'bpo2026' }
+    ];
+
+    const form = document.getElementById('login-form');
+    const errEl = document.getElementById('error-msg');
+    const btn = document.getElementById('login-btn');
+    const label = document.getElementById('btn-label');
+    const spinner = document.getElementById('btn-spinner');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value;
+      errEl.classList.remove('show');
+
+      // Show loading
+      btn.disabled = true;
+      label.textContent = 'Signing in…';
+      spinner.style.display = 'block';
+
+      // Simulate brief auth delay for UX
+      await new Promise(r => setTimeout(r, 700));
+
+      const match = VALID_USERS.find(v => v.user === user && v.pass === pass);
+      if (match) {
+        // Store auth state
+        sessionStorage.setItem('bpo_auth', btoa(`${user}:${pass}`));
+        sessionStorage.setItem('bpo_auth_user', user);
+        // Redirect to dashboard
+        const base = window.location.pathname.replace('login', '').replace(/\/+$/, '');
+        window.location.href = base + '/';
+      } else {
+        spinner.style.display = 'none';
+        label.textContent = 'Sign in';
+        btn.disabled = false;
+        errEl.classList.add('show');
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+      }
+    });
+
+    // If already logged in, redirect
+    if (sessionStorage.getItem('bpo_auth')) {
+      const base = window.location.pathname.replace('login', '').replace(/\/+$/, '');
+      window.location.href = base + '/';
+    }
+  </script>
+</body>
+</html>

@@ -293,17 +293,10 @@ function renderStepper() {
 /* ── Phase List Sidebar ───────────────────────────────────────── */
 function renderPhaseList() {
   const q = searchQuery.trim().toLowerCase();
-  let filtered = [];
-  
-  if (q) {
-    filtered = PHASES.filter(p => `${p.code} ${p.title} ${p.status} ${p.clientAction} ${p.decision} ${p.updateNote}`.toLowerCase().includes(q));
-  } else {
-    // Only show active progressing phase by default
-    filtered = PHASES.filter(p => p.status === 'In Progress');
-    if (!filtered.length) {
-      filtered = [PHASES.find(p => p.id === activePhaseId) || PHASES[0]];
-    }
-  }
+  // Always show ALL phases; filter only when user types a search query
+  const filtered = q
+    ? PHASES.filter(p => `${p.code} ${p.title} ${p.status} ${p.clientAction} ${p.decision} ${p.updateNote}`.toLowerCase().includes(q))
+    : PHASES;
 
   const el = document.getElementById("phase-list");
   if (!filtered.length) {
@@ -524,11 +517,15 @@ function setNavDate() {
 async function init() {
   setNavDate();
 
-  // 1) Try Supabase
+  // 1) Try Supabase — this is the source of truth
   const sbPhases = await loadFromSupabase();
   if (sbPhases && sbPhases.length) {
     PHASES.length = 0;
     sbPhases.forEach(p => PHASES.push(p));
+    // Auto-select the first In Progress phase from real DB data
+    const inProgress = PHASES.find(p => p.status === 'In Progress');
+    if (inProgress) activePhaseId = inProgress.id;
+    else activePhaseId = PHASES[0].id;
   } else {
     // 2) Fall back to localStorage overrides
     const overrides = loadLocalOverrides();
@@ -538,6 +535,8 @@ async function init() {
         if (idx !== -1) Object.assign(PHASES[idx], o);
       });
     }
+    const inProgress = PHASES.find(p => p.status === 'In Progress');
+    if (inProgress) activePhaseId = inProgress.id;
   }
 
   // Load payments from Supabase if available
