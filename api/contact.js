@@ -2,7 +2,7 @@
 import nodemailer from 'nodemailer';
 
 const SUPABASE_URL = 'https://tigxrqqykijkofgntway.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_bty_r-Qe2gdS7k5KXIAOGw_DRtyaEJ8';
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
 
 async function logEscalation(session_id, question, sent) {
   try {

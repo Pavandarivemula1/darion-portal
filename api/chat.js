@@ -2,7 +2,8 @@
 // Env vars: DEEPSEEK_API_KEY, SUPABASE_ANON_KEY
 
 const SUPABASE_URL = 'https://tigxrqqykijkofgntway.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_bty_r-Qe2gdS7k5KXIAOGw_DRtyaEJ8';
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
+if (!SUPABASE_KEY) throw new Error('Missing env var: SUPABASE_ANON_KEY');
 
 const DEEPSEEK_URL = 'https://api.deepseek.com/chat/completions';
 const DEEPSEEK_MODEL = 'deepseek-chat';
@@ -136,7 +137,8 @@ export default async function handler(req, res) {
   if (!question || typeof question !== 'string' || question.trim().length < 2)
     return res.status(400).json({ error: 'Invalid question' });
 
-  const apiKey = process.env.DEEPSEEK_API_KEY || 'sk-f08be9ba8a50475cacd50af73db858fa';
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'AI not configured' });
 
   try {
     // Build full context from DB every time (ensures live data)

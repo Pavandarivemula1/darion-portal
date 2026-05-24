@@ -3,8 +3,19 @@ const CORRECT_PW  = 'BPO@Admin26';
 const SESSION_KEY = 'bpo_admin_session';
 const PROJECT_ID  = 'DARION-BPO-2026-001';
 const SB_URL      = 'https://tigxrqqykijkofgntway.supabase.co';
-const SB_KEY      = 'sb_publishable_bty_r-Qe2gdS7k5KXIAOGw_DRtyaEJ8';
-const SB_HDR      = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' };
+// SB_KEY is loaded at runtime from /api/config — never hardcoded here
+let SB_KEY = '';
+let SB_HDR = { 'Content-Type': 'application/json' };
+
+async function loadConfig() {
+  try {
+    const cfg = await fetch('/api/config').then(r => r.ok ? r.json() : null);
+    if (cfg && cfg.supabaseKey) {
+      SB_KEY = cfg.supabaseKey;
+      SB_HDR = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' };
+    }
+  } catch(e) { console.warn('Config load failed:', e.message); }
+}
 
 /* ── Helpers ──────────────────────────────────────────── */
 const $   = id => document.getElementById(id);
@@ -557,6 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Auto-unlock if session is still active
+  await loadConfig(); // load Supabase key from server before any DB call
   if (sessionStorage.getItem(SESSION_KEY) === 'granted') {
     $('lock-screen').style.display = 'none';
     $('admin-shell').style.display = 'block';

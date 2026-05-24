@@ -1,7 +1,7 @@
-/* ── Supabase config ────────────────────────────────────────── */
 const SB_URL = 'https://tigxrqqykijkofgntway.supabase.co';
-const SB_KEY = 'sb_publishable_bty_r-Qe2gdS7k5KXIAOGw_DRtyaEJ8';
-const SB_HEADERS = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` };
+// SB_KEY is loaded at runtime from the server — never hardcoded here
+let SB_KEY = '';
+let SB_HEADERS = {};
 const PROJECT_ID = 'DARION-BPO-2026-001';
 
 async function sbGet(path) {
@@ -526,6 +526,15 @@ function setNavDate() {
 /* ── Init ─────────────────────────────────────────────────────── */
 async function init() {
   setNavDate();
+
+  // 0) Load Supabase key from server config
+  try {
+    const cfg = await fetch('/api/config').then(r => r.ok ? r.json() : null);
+    if (cfg && cfg.supabaseKey) {
+      SB_KEY = cfg.supabaseKey;
+      SB_HEADERS = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` };
+    }
+  } catch(e) { console.warn('Config fetch failed:', e.message); }
 
   // 1) Try Supabase — this is the source of truth
   const sbPhases = await loadFromSupabase();

@@ -31,6 +31,8 @@ async function sendToSupport(question) {
   let isOpen = false;
   let pendingQuestion = '';
   const messages = [];
+  // Key is loaded from /api/config — never hardcoded
+  let _sbKey = '';
 
   async function loadHistory() {
     const sid = localStorage.getItem('bpo_chat_sid') || window.__chatSessionId;
@@ -43,8 +45,8 @@ async function sendToSupport(question) {
     try {
       const res = await fetch(`https://tigxrqqykijkofgntway.supabase.co/rest/v1/chat_messages?session_id=eq.${sid}&order=created_at.asc`, {
         headers: {
-          'apikey': 'sb_publishable_bty_r-Qe2gdS7k5KXIAOGw_DRtyaEJ8',
-          'Authorization': 'Bearer sb_publishable_bty_r-Qe2gdS7k5KXIAOGw_DRtyaEJ8'
+          'apikey': _sbKey,
+          'Authorization': `Bearer ${_sbKey}`
         }
       });
       if (res.ok) {
@@ -212,7 +214,10 @@ async function sendToSupport(question) {
     document.body.appendChild(panel);
 
     // Load history or render initial message
-    loadHistory();
+    fetch('/api/config').then(r => r.ok ? r.json() : null).then(cfg => {
+      if (cfg && cfg.supabaseKey) _sbKey = cfg.supabaseKey;
+      loadHistory();
+    }).catch(() => loadHistory());
 
     // Toggle open/close
     fab.addEventListener('click', () => {

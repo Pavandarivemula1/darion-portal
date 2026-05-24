@@ -1,7 +1,8 @@
 import fs from 'fs';
 
 async function run() {
-  const token = 'sb_publishable_bty_r-Qe2gdS7k5KXIAOGw_DRtyaEJ8';
+  const token = process.env.SUPABASE_ANON_KEY;
+  if (!token) { console.error('Set SUPABASE_ANON_KEY env var first'); process.exit(1); }
   
   // fetch all phases
   const res = await fetch('https://tigxrqqykijkofgntway.supabase.co/rest/v1/phases?project_id=eq.DARION-BPO-2026-001', {
