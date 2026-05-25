@@ -174,8 +174,8 @@ async function saveListsToDB(phase, risks, evidence) {
       sbFetch(`phase_evidence?phase_id=eq.${phase.id}`, { method: 'DELETE' })
     ]);
     const inserts = [];
-    if (risks.length)    inserts.push(sbFetch('phase_risks',    { method: 'POST', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify(risks.map((r,i)=>({ phase_id: phase.id, description: r, sort_order: i+1 }))) }));
-    if (evidence.length) inserts.push(sbFetch('phase_evidence', { method: 'POST', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify(evidence.map((e,i)=>({ phase_id: phase.id, description: e, sort_order: i+1 }))) }));
+    if (risks.length)    inserts.push(sbFetch('phase_risks',    { method: 'POST', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify(risks.map((r,i)=>({ phase_id: phase.id, description: r, sort_order: i + 1 }))) }));
+    if (evidence.length) inserts.push(sbFetch('phase_evidence', { method: 'POST', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify(evidence.map((e,i)=>({ phase_id: phase.id, description: e, sort_order: i + 1 }))) }));
     await Promise.all(inserts);
     showStatus('Risks & evidence saved to Supabase ✓', 'ok');
     await loadFromDB();
@@ -531,7 +531,7 @@ function bindEvents(p) {
 }
 
 /* ── Global buttons ───────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   $('logout-btn')?.addEventListener('click', () => {
     sessionStorage.removeItem(SESSION_KEY);
     location.reload();
