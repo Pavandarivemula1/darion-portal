@@ -1,20 +1,37 @@
 /* ── Config ───────────────────────────────────────────── */
-const CORRECT_PW  = 'BPO@Admin26';
+// SECURITY: All credentials loaded at runtime from secure endpoints
 const SESSION_KEY = 'bpo_admin_session';
 const PROJECT_ID  = 'DARION-BPO-2026-001';
 const SB_URL      = 'https://tigxrqqykijkofgntway.supabase.co';
-// SB_KEY is loaded at runtime from /api/config — never hardcoded here
+
+// Runtime-loaded credentials (never hardcoded)
+let CORRECT_PW = '';
 let SB_KEY = '';
 let SB_HDR = { 'Content-Type': 'application/json' };
 
 async function loadConfig() {
   try {
-    const cfg = await fetch('/api/config').then(r => r.ok ? r.json() : null);
-    if (cfg && cfg.supabaseKey) {
-      SB_KEY = cfg.supabaseKey;
-      SB_HDR = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' };
+    // Load ALL sensitive config from backend endpoint
+    const cfg = await fetch('/api/admin-config', {
+      headers: { 'Content-Type': 'application/json' }
+    }).then(r => r.ok ? r.json() : null);
+    
+    if (cfg) {
+      // Load admin password from backend
+      if (cfg.adminPassword) {
+        CORRECT_PW = cfg.adminPassword;
+      }
+      // Load Supabase key from backend
+      if (cfg.supabaseKey) {
+        SB_KEY = cfg.supabaseKey;
+        SB_HDR = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' };
+      }
+    } else {
+      console.error('Failed to load admin config from backend');
     }
-  } catch(e) { console.warn('Config load failed:', e.message); }
+  } catch(e) { 
+    console.error('Config load failed:', e.message); 
+  }
 }
 
 /* ── Helpers ──────────────────────────────────────────── */
@@ -238,7 +255,7 @@ function showStatus(msg, type) {
   el.className = 'status-bar ' + (type || '');
 }
 
-/* ── Toast ────────────────────────────────────────────── */
+/* ── Toast ────────────────────────────────────────────– */
 function toast(msg) {
   const t = $('toast');
   if (!t) return;
@@ -249,13 +266,17 @@ function toast(msg) {
 
 /* ── Auth ─────────────────────────────────────────────── */
 function unlock() {
+  if (!CORRECT_PW) {
+    $('lock-error').textContent = 'Admin credentials not loaded. Please refresh.';
+    return;
+  }
   if ($('pw-input').value === CORRECT_PW) {
     sessionStorage.setItem(SESSION_KEY, 'granted');
     $('lock-screen').style.display = 'none';
     $('admin-shell').style.display = 'block';
     loadFromDB();
   } else {
-    $('lock-error').textContent = 'Incorrect key. Try again.';
+    $('lock-error').textContent = 'Incorrect credentials. Try again.';
     $('pw-input').value = '';
     $('pw-input').focus();
     setTimeout(() => $('lock-error').textContent = '', 3000);
@@ -567,8 +588,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     saving = false;
   });
 
-  // Auto-unlock if session is still active
-  await loadConfig(); // load Supabase key from server before any DB call
+  // Load ALL sensitive config from backend before any operations
+  await loadConfig();
+  
+  if (!CORRECT_PW) {
+    showStatus('⚠ Admin credentials failed to load from backend. Please contact system administrator.', 'error');
+    $('lock-error').textContent = 'Configuration error. Contact admin.';
+    return;
+  }
+
   if (sessionStorage.getItem(SESSION_KEY) === 'granted') {
     $('lock-screen').style.display = 'none';
     $('admin-shell').style.display = 'block';
